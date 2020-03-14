@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/hashicorp/hcl2/gohcl"
-	"github.com/hashicorp/hcl2/hcl"
-	"github.com/hashicorp/hcl2/hclparse"
+	hcl "github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/gohcl"
+	"github.com/hashicorp/hcl/v2/hclparse"
 )
 
 type Variable struct {
-	Name        string `hcl:"variable,label"`
+	Name        string  `hcl:"name,label"`
 	Description *string `hcl:"description,attr"`
 	Default     *string `hcl:"default,attr"`
 }
@@ -23,7 +23,6 @@ type Config struct {
 }
 
 func main() {
-	var conf Config
 	var vars []Variable
 
 	root := "."
@@ -34,6 +33,7 @@ func main() {
 
 	err := filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
+			var conf Config
 			if info.IsDir() {
 				return nil
 			}
@@ -52,7 +52,7 @@ func main() {
 				if decodeDiags.HasErrors() {
 					panic(decodeDiags.Error())
 				}
-				vars = append(vars, conf.Variables ...)
+				vars = append(vars, conf.Variables...)
 			}
 			return nil
 		})
