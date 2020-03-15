@@ -6,11 +6,11 @@ import (
 )
 
 func TestParseTfModule(t *testing.T) () {
-	module1 := *module.Module{
+	module1 := &module.Module{
 		Variables: []*module.Variable{
 			{
 				Name: "no_default",
-				Default: nil,
+				Default: "",
 				Type: "string",
 				Description: "no default description",
 			},
@@ -23,18 +23,19 @@ func TestParseTfModule(t *testing.T) () {
 				Type: "object({name=string,count=number}",
 				Description: "object type description",
 			},
-		}
+		},
 	}
 
 	var tests = []struct {
 		source string
-		module module.Module
+		module *module.Module
 	}{
 		{"./module1", module1},
 	}
 
+	p := NewParser("")
 	for _, test := range tests {
-		if module, _ := ParseTfModule(test.source); module != t.module {
+		if module, _ := p.ParseTfModule(test.source); module != test.module {
 			t.Errorf("source %s: %s\nExpected: %s", test.source, module, test.module)
 		}
 	}

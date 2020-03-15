@@ -10,9 +10,10 @@ type Resource struct {
 
 // Variable is terraform module variable
 type Variable struct {
-	Name        string  `hcl:"name,label"`
-	Description *string `hcl:"description,attr"`
-	Default     *string `hcl:"default,attr"`
+	Name        string `hcl:"name,label"`
+	Type        string `hcl:"type,label"`
+	Description string `hcl:"description,attr"`
+	Default     string `hcl:"default,attr"`
 }
 
 // Output is terraform module output value info
@@ -29,6 +30,6 @@ type Module struct {
 	Remain    hcl.Body    `hcl:",remain"`
 }
 
-func (*m Module) String() string {
+func (m *Module) String() string {
 	return ""
 }
