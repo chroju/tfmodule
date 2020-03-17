@@ -1,4 +1,4 @@
-package module
+package tfmodule
 
 import (
 	"github.com/hashicorp/hcl/v2"
@@ -13,11 +13,13 @@ type Resource struct {
 
 // Variable is terraform module variable
 type Variable struct {
-	Name        hclwrite.Tokens `hcl:"name,label"`
-	Type        hclwrite.Tokens `hcl:"type,label"`
-	Description hclwrite.Tokens `hcl:"description,attr"`
+	Name        string          `hcl:"name,label"`
+	Type        hclwrite.Tokens `hcl:"type,attr"`
+	Description string          `hcl:"description,attr"`
 	Default     hclwrite.Tokens `hcl:"default,attr"`
 }
+
+type Variables []*Variable
 
 // Output is terraform module output value info
 type Output struct {
@@ -27,9 +29,9 @@ type Output struct {
 
 // Module is a struct to express terraform module
 type Module struct {
-	Variables []*Variable     `hcl:"variable,block"`
-	Outputs   []*Output       `hcl:"output,block"`
-	Resources []*Resource     `hcl:"resource,block"`
+	Variables Variables       `hcl:"variable,block"`
+	Outputs   *[]Output       `hcl:"output,block"`
+	Resources *[]Resource     `hcl:"resource,block"`
 	Source    hclwrite.Tokens `hcl:"source,attr"`
 	Remain    hcl.Body        `hcl:",remain"`
 }
@@ -45,7 +47,7 @@ func (m *Module) String() string {
 	moduleBody.AppendNewline()
 
 	for _, v := range m.Variables {
-		moduleBody.SetAttributeRaw(string(v.Name.Bytes()), v.Default)
+		moduleBody.SetAttributeRaw(v.Name, v.Default)
 	}
 
 	return string(f.Bytes())

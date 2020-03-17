@@ -1,27 +1,26 @@
-package parser
+package tfmodule
 
 import (
 	"testing"
 
-	"github.com/chroju/tfmodule/module"
-	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/zclconf/go-cty/cty"
 )
 
-func TestParseTfModule(t *testing.T) () {
-	module1 := &module.Module{
-		Variables: []*module.Variable{
+func TestParseTfModule(t *testing.T) {
+	module1 := &Module{
+		Variables: []*Variable{
 			{
-				Name: hclwrite.TokensForValue(cty.StringVal("no_default")),
-				Default: hclwrite.TokensForValue(cty.StringVal("")),
-				Type: hclwrite.TokensForValue(cty.StringVal("string")),
-				Description: hclwrite.TokensForValue(cty.StringVal("no default description")),
+				Name:        "no_default",
+				Default:     hclwrite.TokensForValue(cty.StringVal("")),
+				Type:        hclwrite.TokensForValue(cty.StringVal("string")),
+				Description: "no default description",
 			},
 			{
-				Name: hclwrite.TokensForValue(cty.StringVal("object_type")),
+				Name: "object_type",
 				Default: hclwrite.TokensForValue(cty.ObjectVal(map[string]cty.Value{
-					"name": cty.StringVal("default"),
+					"name":  cty.StringVal("default"),
 					"count": cty.NumberIntVal(1),
 				})),
 				Type: hclwrite.Tokens{
@@ -78,16 +77,16 @@ func TestParseTfModule(t *testing.T) () {
 						Bytes: []byte(")"),
 					},
 				},
-				Description: hclwrite.TokensForValue(cty.StringVal("object type description")),
+				Description: "object type description",
 			},
 		},
 	}
 
 	var tests = []struct {
 		source string
-		module *module.Module
+		module *Module
 	}{
-		{"./module1", module1},
+		{"./test/module1", module1},
 	}
 
 	p := NewParser("")
