@@ -1,13 +1,23 @@
-variable "test" {
-    default = "test"
-    description = "test description"
-}
-
 variable "hoge" {
-    default = "test2"
-    description = "test2 description"
+  type        = string
+  default     = "hoge"
+  description = "hoge description"
 }
 
-resource "aws_instance" "name" {
-  ami = "hoge"
-}
+# variable "fuga" {
+#   type = object(
+#     {
+#       name  = string,
+#       count = number,
+#     }
+#   )
+#   default = {
+#     name  = "default",
+#     count = 1
+#   }
+#   description = "fuga description"
+# }
+
+# variable "piyo" {
+#   type = bool
+# }

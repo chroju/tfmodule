@@ -1,6 +1,8 @@
 package tfmodule
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -10,7 +12,7 @@ import (
 
 func TestParseTfModule(t *testing.T) {
 	module1 := &Module{
-		Variables: []*Variable{
+		Variables: &[]Variable{
 			{
 				Name:        "no_default",
 				Default:     hclwrite.TokensForValue(cty.StringVal("")),
@@ -91,8 +93,10 @@ func TestParseTfModule(t *testing.T) {
 
 	p := NewParser("")
 	for _, test := range tests {
-		if module, _ := p.ParseTfModule(test.source); module != test.module {
+		if module, _ := p.ParseTfModule(test.source); reflect.DeepEqual(module, test.module) {
 			t.Errorf("source %s: %s\nExpected: %s", test.source, module, test.module)
+		} else {
+			fmt.Printf("%s", module)
 		}
 	}
 }
