@@ -3,24 +3,28 @@ tfmodule
 
 ## Usage
 
-### import
+### template
 
 ```bash
-$ tfmodule import "../modules/hoge" -n "hoge"
+$ tfmodule template "../modules/hoge" -n "hoge"
 module "hoge" {
   source = "../modules/hoge"
 
-  // variable discription (type: number)
+  // variable discription
+  // type: number
   instance_counts = 2
-  // variable discription (type: string)
+
+  // variable discription
+  // type: string
   instance_comment = "" // no default value
 }
 
-$ tfmodule import "../modules/hoge" -n "hoge" --required-only
+$ tfmodule template "../modules/hoge" -n "hoge" --required-only
 module "hoge" {
   source = "../modules/hoge"
 
-  // variable discription (type: string)
+  // variable discription 
+  // type: string
   instance_comment = "" // no default value
 }
 ```
