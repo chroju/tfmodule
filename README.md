@@ -17,7 +17,6 @@ module "hoge" {
   // variable discription
   // type: number
   instance_counts = 2
-
   // variable discription
   // type: string
   instance_comment = "" // no default value

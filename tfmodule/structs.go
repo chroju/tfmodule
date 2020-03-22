@@ -70,7 +70,6 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 		}
 		moduleBody.AppendUnstructuredTokens(v.GenerateComment())
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
-		moduleBody.AppendNewline()
 	}
 
 	return string(f.Bytes())
