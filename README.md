@@ -1,16 +1,20 @@
 tfmodule
 ========
 
-tfmodule is a CLI tool for management to Terraform modules.
+tfmodule is a CLI tool for managing Terraform modules.
 
 ## Usage
 
 tfmodule has sub-commands `template` , `analyze` .
 
+**NOTE: in progress status, so you can use only `template` sub-command.**
+
 ### template
 
+`template` parses the Terraform module configuration in the given file path, and outputs a template for the module.
+
 ```bash
-$ tfmodule template "../modules/hoge"
+$ tfmodule template ../modules/hoge
 module "hoge" {
   source = "../modules/hoge"
 
@@ -22,10 +26,10 @@ module "hoge" {
   instance_comment = "" // no default value
 }
 
-# You can replace module name with -n or --name option
-# With --minimum option, ignore variables which is given the default value
-$ tfmodule template "../modules/hoge" -n "fuga" --minimum
-module "hoge" {
+# You can replace module name in the template with -n or --name option.
+# Use the --minimum option, ignore variables with default values.
+$ tfmodule template ../modules/hoge -n fuga --minimum
+module "fuga" {
   source = "../modules/hoge"
 
   // variable discription 
@@ -34,11 +38,20 @@ module "hoge" {
 }
 ```
 
-## analyze
+### analyze
+
+`analyze` analyzes a Terraform module configuration and outputs the description about its internal structure.
 
 ```bash
 $ tfmodule analyze "../modules/hoge"
 resources:
 aws_s3_bucket.s3_bucket
 aws_s3_bucket_policy.s3_bucket_policy
+
+outputs:
+bucket_arn: aws_s3_bucket.s3_bucket.arn
 ```
+
+## Author
+
+chroju <chor.chroju@gmail.com>
