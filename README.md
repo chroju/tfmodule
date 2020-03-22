@@ -1,12 +1,16 @@
 tfmodule
 ========
 
+tfmodule is a CLI tool for management to Terraform modules.
+
 ## Usage
+
+tfmodule has sub-commands `template` , `analyze` .
 
 ### template
 
 ```bash
-$ tfmodule template "../modules/hoge" -n "hoge"
+$ tfmodule template "../modules/hoge"
 module "hoge" {
   source = "../modules/hoge"
 
@@ -19,7 +23,9 @@ module "hoge" {
   instance_comment = "" // no default value
 }
 
-$ tfmodule template "../modules/hoge" -n "hoge" --required-only
+# You can replace module name with -n or --name option
+# With --minimum option, ignore variables which is given the default value
+$ tfmodule template "../modules/hoge" -n "fuga" --minimum
 module "hoge" {
   source = "../modules/hoge"
 

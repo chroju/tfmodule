@@ -1,6 +1,7 @@
 package tfmodule
 
 import (
+	"reflect"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -50,7 +51,12 @@ func NewModule(source string) *Module {
 
 // String returns module HCL expression
 func (m *Module) String() string {
+	return m.PrintModuleTemplate(false)
+}
+
+func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 	f := hclwrite.NewEmptyFile()
+
 	rootBody := f.Body()
 	moduleBlock := rootBody.AppendNewBlock("module", []string{m.Name})
 	moduleBody := moduleBlock.Body()
@@ -59,6 +65,9 @@ func (m *Module) String() string {
 	moduleBody.AppendNewline()
 
 	for _, v := range *m.Variables {
+		if isMinimum && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
+			continue
+		}
 		moduleBody.AppendUnstructuredTokens(v.GenerateComment())
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
 		moduleBody.AppendNewline()

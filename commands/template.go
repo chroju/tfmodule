@@ -25,10 +25,12 @@ func (c *TemplateCommand) Run(args []string) int {
 
 	// flags
 	var name string
+	var isMinimum bool
 	buf := &bytes.Buffer{}
 	f := flag.NewFlagSet("template", flag.ContinueOnError)
 	f.SetOutput(buf)
 	f.StringVarP(&name, "name", "n", "", "module name")
+	f.BoolVar(&isMinimum, "minimum", false, "print minimum template")
 	if err := f.Parse(flagArgs); err != nil {
 		c.UI.Error(helpTemplate)
 		return 1
@@ -43,7 +45,7 @@ func (c *TemplateCommand) Run(args []string) int {
 	if name != "" {
 		module.Name = name
 	}
-	c.UI.Output(module.String())
+	c.UI.Output(module.PrintModuleTemplate(isMinimum))
 
 	return 0
 }
