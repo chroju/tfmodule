@@ -21,7 +21,11 @@ func (c *TemplateCommand) Run(args []string) int {
 	source := args[0]
 
 	parser := tfmodule.NewParser(source)
-	module, _ := parser.ParseTfModule(source)
+	module, err := parser.ParseTfModule(source)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
 	c.UI.Output(module.String())
 
 	return 0
@@ -35,4 +39,12 @@ func (c *TemplateCommand) Synopsis() string {
 	return "Parse Terraform module files and output module template."
 }
 
-const helpTemplate = "Usage: tfmodule template <source>"
+const helpTemplate = `
+Usage: tfmodule template [options] SOURCE
+
+  Output the Terraform module template with given module source path.
+
+Options:
+
+  --minimum    Ouptput template does not include the variables which has a default value.
+`

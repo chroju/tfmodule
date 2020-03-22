@@ -3,7 +3,6 @@ package tfmodule
 import (
 	"strings"
 
-	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/zclconf/go-cty/cty"
@@ -37,7 +36,6 @@ type Module struct {
 	Outputs   *[]Output   `hcl:"output,block"`
 	Resources *[]Resource `hcl:"resource,block"`
 	Source    string      `hcl:"source,attr"`
-	Remain    hcl.Body    `hcl:",remain"`
 }
 
 // NewModule returns a new module
@@ -89,7 +87,7 @@ func (v *Variable) GenerateComment() hclwrite.Tokens {
 		},
 		{
 			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte("type: "),
+			Bytes: []byte("type:"),
 		},
 	}
 	tokens = append(tokens, v.Type...)

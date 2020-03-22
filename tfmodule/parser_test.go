@@ -1,8 +1,6 @@
 package tfmodule
 
 import (
-	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -12,19 +10,81 @@ import (
 
 func TestParseTfModule(t *testing.T) {
 	module1 := &Module{
+		Name:   "module1",
+		Source: "./test/module1",
 		Variables: &[]Variable{
 			{
-				Name:        "no_default",
-				Default:     hclwrite.TokensForValue(cty.StringVal("")),
-				Type:        hclwrite.TokensForValue(cty.StringVal("string")),
+				Name:    "no_default",
+				Default: hclwrite.TokensForValue(cty.StringVal("")),
+				// Default: nil,
+				Type: hclwrite.Tokens{
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("string"),
+					},
+				},
 				Description: "no default description",
 			},
 			{
 				Name: "object_type",
-				Default: hclwrite.TokensForValue(cty.ObjectVal(map[string]cty.Value{
-					"name":  cty.StringVal("default"),
-					"count": cty.NumberIntVal(1),
-				})),
+				Default: hclwrite.Tokens{
+					{
+						Type:  hclsyntax.TokenOBrace,
+						Bytes: []byte("{"),
+					},
+					{
+						Type:  hclsyntax.TokenNewline,
+						Bytes: []byte("\n"),
+					},
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("name"),
+					},
+					{
+						Type:  hclsyntax.TokenEqual,
+						Bytes: []byte("="),
+					},
+					{
+						Type:  hclsyntax.TokenOQuote,
+						Bytes: []byte("\""),
+					},
+					{
+						Type:  hclsyntax.TokenQuotedLit,
+						Bytes: []byte("default"),
+					},
+					{
+						Type:  hclsyntax.TokenCQuote,
+						Bytes: []byte("\""),
+					},
+					{
+						Type:  hclsyntax.TokenComma,
+						Bytes: []byte(","),
+					},
+					{
+						Type:  hclsyntax.TokenNewline,
+						Bytes: []byte("\n"),
+					},
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("count"),
+					},
+					{
+						Type:  hclsyntax.TokenEqual,
+						Bytes: []byte("="),
+					},
+					{
+						Type:  hclsyntax.TokenNumberLit,
+						Bytes: []byte("1"),
+					},
+					{
+						Type:  hclsyntax.TokenNewline,
+						Bytes: []byte("\n"),
+					},
+					{
+						Type:  hclsyntax.TokenCBrace,
+						Bytes: []byte("}"),
+					},
+				},
 				Type: hclwrite.Tokens{
 					{
 						Type:  hclsyntax.TokenIdent,
@@ -89,14 +149,21 @@ func TestParseTfModule(t *testing.T) {
 		module *Module
 	}{
 		{"./test/module1", module1},
+		{"./test/not_exist", (*Module)(nil)},
 	}
 
 	p := NewParser("")
 	for _, test := range tests {
-		if module, _ := p.ParseTfModule(test.source); reflect.DeepEqual(module, test.module) {
-			t.Errorf("source %s: %s\nExpected: %s", test.source, module, test.module)
-		} else {
-			fmt.Printf("%s", module)
+		m, _ := p.ParseTfModule(test.source)
+		if m == nil {
+			if test.module == nil {
+				continue
+			} else {
+				t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
+			}
+		}
+		if m.String() != test.module.String() {
+			t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
 		}
 	}
 }

@@ -25,11 +25,15 @@ func NewParser(source string) *Parser {
 }
 
 // ParseTfModule parses terraform module and returns module structs
-func (p *Parser) ParseTfModule(source string) (*Module, hcl.Diagnostics) {
+func (p *Parser) ParseTfModule(source string) (*Module, error) {
 	//
 	var variables []Variable
 	err := filepath.Walk(source,
 		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
 			if info.IsDir() || !strings.HasSuffix(info.Name(), ".tf") {
 				return nil
 			}
@@ -55,11 +59,11 @@ func (p *Parser) ParseTfModule(source string) (*Module, hcl.Diagnostics) {
 			return nil
 		})
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
-	module := &Module{
-		Variables: &variables,
-	}
+	module := NewModule(source)
+	module.Variables = &variables
+
 	return module, nil
 }
 
