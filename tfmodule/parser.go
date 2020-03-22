@@ -18,17 +18,15 @@ type Parser struct {
 }
 
 // NewParser return a new parser with given module source path.
-func NewParser(source string) *Parser {
-	return &Parser{
-		source: source,
-	}
+func NewParser() *Parser {
+	return &Parser{}
 }
 
 // ParseTfModule parses terraform module and returns module structs
 func (p *Parser) ParseTfModule(source string) (*Module, error) {
-	//
+	p.source = source
 	var variables []Variable
-	err := filepath.Walk(source,
+	err := filepath.Walk(p.source,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -61,7 +59,7 @@ func (p *Parser) ParseTfModule(source string) (*Module, error) {
 	if err != nil {
 		return nil, err
 	}
-	module := NewModule(source)
+	module := NewModule(p.source)
 	module.Variables = &variables
 
 	return module, nil

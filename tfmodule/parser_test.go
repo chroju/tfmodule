@@ -152,7 +152,7 @@ func TestParseTfModule(t *testing.T) {
 		{"./test/not_exist", (*Module)(nil)},
 	}
 
-	p := NewParser("")
+	p := NewParser()
 	for _, test := range tests {
 		m, _ := p.ParseTfModule(test.source)
 		if m == nil {

@@ -20,7 +20,7 @@ func (c *TemplateCommand) Run(args []string) int {
 	}
 	source := args[0]
 
-	parser := tfmodule.NewParser(source)
+	parser := tfmodule.NewParser()
 	module, err := parser.ParseTfModule(source)
 	if err != nil {
 		c.UI.Error(err.Error())
