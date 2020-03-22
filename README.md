@@ -1,6 +1,9 @@
 tfmodule
 ========
 
+![test](https://github.com/chroju/tfmodule/workflows/test/badge.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/chroju/tfmodule/badge.svg?branch=master)](https://coveralls.io/github/chroju/tfmodule?branch=master)
+
 tfmodule is a CLI tool for managing Terraform modules.
 
 ## Usage

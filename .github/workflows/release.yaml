@@ -14,10 +14,6 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: "1.14.1"
-    - name: Coveralls
-      uses: coverallsapp/github-action@v1.0.1
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
     - name: Run goreleaser
       uses: goreleaser/goreleaser-action@v1
       env:
@@ -26,3 +22,17 @@ jobs:
       with:
         version: latest
         args: release --rm-dist
+    - name: Calc coverage 
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin   
+        go test -v ./... -covermode=count -coverprofile=coverage.out
+    - name: Convert coverage to lcov
+      uses: jandelgado/gcov2lcov-action@v1.0.0
+      with:
+        infile: coverage.out
+        outfile: coverage.lcov
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.0.1
+      with:
+        github-token: ${{ secrets.github_token }}
+        path-to-lcov: coverage.lcov
