@@ -24,3 +24,29 @@ jobs:
         export PATH=$PATH:$(go env GOPATH)/bin
         go get golang.org/x/lint/golint
         make test
+  coverage: 
+    if: github.ref == 'refs/heads/master'
+    name: Calc coverage of tfmodule
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: "1.14.1"
+    - name: Calc coverage 
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin   
+        go test -v ./... -covermode=count -coverprofile=coverage.out
+    - name: Convert coverage to lcov
+      uses: jandelgado/gcov2lcov-action@v1.0.0
+      with:
+        infile: coverage.out
+        outfile: coverage.lcov
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.0.1
+      with:
+        github-token: ${{ secrets.github_token }}
+        path-to-lcov: coverage.lcov
+
