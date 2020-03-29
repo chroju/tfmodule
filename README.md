@@ -29,9 +29,45 @@ module "hoge" {
   instance_comment = "" // no default value
 }
 
-# You can replace module name in the template with -n or --name option.
-# Use the --minimum option, ignore variables with default values.
-$ tfmodule template ../modules/hoge -n fuga --minimum
+output "hoge_instance_id" {
+  value = module.hoge.instance_id
+}
+```
+
+You can replace module name in the template with `-n` or `--name` option.
+
+```
+$ tfmodule template ../modules/hoge -n fuga
+module "fuga" {
+  source = "../modules/hoge"
+
+  // variable discription 
+  // type: string
+  instance_comment = "" // no default value
+}
+
+output "fuga_instance_id" {
+  value = module.fuga.instance_id
+}
+```
+
+Use the `--no-default` option, ignore variables with default values, and `--no-outputs` option, ignore outputs.
+
+```
+$ tfmodule template ../modules/hoge --no-defaults --no-outputs
+module "fuga" {
+  source = "../modules/hoge"
+
+  // variable discription 
+  // type: string
+  instance_comment = "" // no default value
+}
+```
+
+`--minimum` has the same meaning as adding both `--no-outputs` and `--no-defaults` .
+
+```
+$ tfmodule template ../modules/hoge --minimum
 module "fuga" {
   source = "../modules/hoge"
 
