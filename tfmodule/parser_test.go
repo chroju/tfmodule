@@ -12,6 +12,33 @@ func TestParseTfModule(t *testing.T) {
 	module1 := &Module{
 		Name:   "module1",
 		Source: "./test/module1",
+		Outputs: &[]Output{
+			{
+				Value: hclwrite.Tokens{
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("aws_instance"),
+					},
+					{
+						Type:  hclsyntax.TokenDot,
+						Bytes: []byte("."),
+					},
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("test"),
+					},
+					{
+						Type:  hclsyntax.TokenDot,
+						Bytes: []byte("."),
+					},
+					{
+						Type:  hclsyntax.TokenIdent,
+						Bytes: []byte("arn"),
+					},
+				},
+				Description: "test instance",
+			},
+		},
 		Variables: &[]Variable{
 			{
 				Name:    "no_default",

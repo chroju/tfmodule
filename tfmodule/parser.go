@@ -24,8 +24,10 @@ func NewParser() *Parser {
 
 // ParseTfModule parses terraform module and returns module structs
 func (p *Parser) ParseTfModule(source string) (*Module, error) {
-	p.source = source
 	var variables []Variable
+	var outputs []Output
+
+	p.source = source
 	err := filepath.Walk(p.source,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -51,6 +53,8 @@ func (p *Parser) ParseTfModule(source string) (*Module, error) {
 				switch block.Type() {
 				case "variable":
 					variables = append(variables, parseVariable(block))
+				case "output":
+					outputs = append(outputs, parseOutput(block))
 				}
 			}
 
@@ -61,6 +65,7 @@ func (p *Parser) ParseTfModule(source string) (*Module, error) {
 	}
 	module := NewModule(p.source)
 	module.Variables = &variables
+	module.Outputs = &outputs
 
 	return module, nil
 }
@@ -89,4 +94,28 @@ func parseVariable(block *hclwrite.Block) Variable {
 		}
 	}
 	return variable
+}
+
+func parseOutput(block *hclwrite.Block) Output {
+	output := Output{
+		Name:        block.Labels()[0],
+		Description: "",
+	}
+	body := block.Body()
+	for k, v := range body.Attributes() {
+		switch k {
+		case "value":
+			var typeTokens hclwrite.Tokens
+			for _, t := range v.Expr().BuildTokens(nil) {
+				if t.Type != hclsyntax.TokenNewline {
+					typeTokens = append(typeTokens, t)
+				}
+			}
+			output.Value = typeTokens
+		case "description":
+			description := string(v.Expr().BuildTokens(nil).Bytes())
+			output.Description = description[2 : len(description)-1]
+		}
+	}
+	return output
 }

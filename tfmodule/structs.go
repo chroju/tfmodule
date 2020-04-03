@@ -25,7 +25,7 @@ type Variable struct {
 
 // Output is terraform module output value info
 type Output struct {
-	Name        hclwrite.Tokens `hcl:"name,label"`
+	Name        string          `hcl:"name,label"`
 	Value       hclwrite.Tokens `hcl:"value,attr"`
 	Description string          `hcl:"description,attr"`
 }
