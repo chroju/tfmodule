@@ -72,6 +72,38 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
 	}
 
+	for _, v := range *m.Outputs {
+		if isMinimum {
+			continue
+		}
+		rootBody.AppendNewline()
+		outputBlock := rootBody.AppendNewBlock("output", []string{m.Name + "_" + v.Name})
+		outputBody := outputBlock.Body()
+		tokens := hclwrite.Tokens{
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte("module"),
+			},
+			{
+				Type:  hclsyntax.TokenDot,
+				Bytes: []byte("."),
+			},
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(m.Name),
+			},
+			{
+				Type:  hclsyntax.TokenDot,
+				Bytes: []byte("."),
+			},
+			{
+				Type:  hclsyntax.TokenIdent,
+				Bytes: []byte(v.Name),
+			},
+		}
+		outputBody.SetAttributeRaw("value", tokens)
+	}
+
 	return string(f.Bytes())
 }
 

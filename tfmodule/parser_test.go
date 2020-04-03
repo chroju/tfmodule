@@ -14,6 +14,7 @@ func TestParseTfModule(t *testing.T) {
 		Source: "./test/module1",
 		Outputs: &[]Output{
 			{
+				Name: "test",
 				Value: hclwrite.Tokens{
 					{
 						Type:  hclsyntax.TokenIdent,
