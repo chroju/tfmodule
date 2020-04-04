@@ -6,6 +6,20 @@ tfmodule
 
 tfmodule is a CLI tool for managing Terraform modules.
 
+## Install
+
+### Download binary
+
+Download the latest binary from [here](https://github.com/chroju/tfmodule/releases) and put it in your `$PATH` directory.
+
+### go get
+
+If you have set up Go environment, you can also install `tfmodule` with `go get` command.
+
+```
+$ go get github.com/chroju/tfmodule
+```
+
 ## Usage
 
 tfmodule has sub-commands `template` , `analyze` .
