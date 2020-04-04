@@ -26,6 +26,9 @@ func main() {
 		"template": func() (cli.Command, error) {
 			return &commands.TemplateCommand{UI: &cli.ColoredUi{Ui: ui, ErrorColor: cli.UiColorRed}}, nil
 		},
+		"analyze": func() (cli.Command, error) {
+			return &commands.AnalyzeCommand{UI: &cli.ColoredUi{Ui: ui, ErrorColor: cli.UiColorRed}}, nil
+		},
 	}
 
 	exitStatus, err := c.Run()

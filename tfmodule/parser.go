@@ -111,9 +111,7 @@ func parseOutput(block *hclwrite.Block) Output {
 		case "value":
 			var typeTokens hclwrite.Tokens
 			for _, t := range v.Expr().BuildTokens(nil) {
-				if t.Type != hclsyntax.TokenNewline {
-					typeTokens = append(typeTokens, t)
-				}
+				typeTokens = append(typeTokens, t)
 			}
 			output.Value = typeTokens
 		case "description":

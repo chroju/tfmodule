@@ -2,6 +2,7 @@ package tfmodule
 
 import (
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -68,7 +69,7 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 		if isMinimum && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
 			continue
 		}
-		moduleBody.AppendUnstructuredTokens(v.GenerateComment())
+		moduleBody.AppendUnstructuredTokens(v.generateComment())
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
 	}
 
@@ -107,7 +108,7 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 	return string(f.Bytes())
 }
 
-func (v *Variable) GenerateComment() hclwrite.Tokens {
+func (v *Variable) generateComment() hclwrite.Tokens {
 	tokens := hclwrite.Tokens{
 		{
 			Type:  hclsyntax.TokenSlash,
@@ -136,4 +137,28 @@ func (v *Variable) GenerateComment() hclwrite.Tokens {
 		Bytes: []byte("\n"),
 	})
 	return tokens
+}
+
+func (m *Module) PrintModuleAnalysis() string {
+	emptyLine := []string{""}
+	results := []string{"resources:"}
+
+	resources := make([]string, len(*m.Resources))
+	for i, r := range *m.Resources {
+		resources[i] = "  " + r.Type + "." + r.Name
+	}
+	sort.Strings(resources)
+	results = append(results, resources...)
+	results = append(results, emptyLine...)
+	results = append(results, "outputs:")
+
+	outputs := make([]string, len(*m.Outputs))
+	for i, o := range *m.Outputs {
+		outputs[i] = " " + string(o.Value.Bytes())
+	}
+	sort.Strings(outputs)
+	results = append(results, outputs...)
+	results = append(results, emptyLine...)
+
+	return strings.Join(results, "\n")
 }
