@@ -10,8 +10,6 @@ tfmodule is a CLI tool for managing Terraform modules.
 
 tfmodule has sub-commands `template` , `analyze` .
 
-**NOTE: in progress status, so you can use only `template` sub-command.**
-
 ### template
 
 `template` parses the Terraform module configuration in the given file path, and outputs a template for the module.
@@ -84,12 +82,16 @@ module "fuga" {
 ```bash
 $ tfmodule analyze "../modules/hoge"
 resources:
-aws_s3_bucket.s3_bucket
-aws_s3_bucket_policy.s3_bucket_policy
+  aws_s3_bucket.s3_bucket
+  aws_s3_bucket_policy.s3_bucket_policy
 
 outputs:
-bucket_arn: aws_s3_bucket.s3_bucket.arn
+  bucket_arn: aws_s3_bucket.s3_bucket.arn
 ```
+
+## TODO
+
+- [ ] Analyze the modules on the Internet as well.
 
 ## Author
 
