@@ -11,8 +11,8 @@ import (
 
 // Resource is terraform module resource
 type Resource struct {
-	Type hclwrite.Tokens `hcl:"type,label"`
-	Name hclwrite.Tokens `hcl:"name,label"`
+	Type string `hcl:"type,label"`
+	Name string `hcl:"name,label"`
 }
 
 // Variable is terraform module variable

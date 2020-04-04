@@ -26,6 +26,7 @@ func NewParser() *Parser {
 func (p *Parser) ParseTfModule(source string) (*Module, error) {
 	var variables []Variable
 	var outputs []Output
+	var resources []Resource
 
 	p.source = source
 	err := filepath.Walk(p.source,
@@ -55,6 +56,8 @@ func (p *Parser) ParseTfModule(source string) (*Module, error) {
 					variables = append(variables, parseVariable(block))
 				case "output":
 					outputs = append(outputs, parseOutput(block))
+				case "resource":
+					resources = append(resources, parseResource(block))
 				}
 			}
 
@@ -66,6 +69,7 @@ func (p *Parser) ParseTfModule(source string) (*Module, error) {
 	module := NewModule(p.source)
 	module.Variables = &variables
 	module.Outputs = &outputs
+	module.Resources = &resources
 
 	return module, nil
 }
@@ -118,4 +122,12 @@ func parseOutput(block *hclwrite.Block) Output {
 		}
 	}
 	return output
+}
+
+func parseResource(block *hclwrite.Block) Resource {
+	resource := Resource{
+		Type: block.Labels()[0],
+		Name: block.Labels()[1],
+	}
+	return resource
 }
