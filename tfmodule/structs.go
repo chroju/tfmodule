@@ -52,10 +52,10 @@ func NewModule(source string) *Module {
 
 // String returns module HCL expression
 func (m *Module) String() string {
-	return m.PrintModuleTemplate(false)
+	return m.PrintModuleTemplate(false, false)
 }
 
-func (m *Module) PrintModuleTemplate(isMinimum bool) string {
+func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
 	f := hclwrite.NewEmptyFile()
 
 	rootBody := f.Body()
@@ -66,7 +66,7 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 	moduleBody.AppendNewline()
 
 	for _, v := range *m.Variables {
-		if isMinimum && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
+		if isNoDefaults && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
 			continue
 		}
 		moduleBody.AppendUnstructuredTokens(v.generateComment())
@@ -74,7 +74,7 @@ func (m *Module) PrintModuleTemplate(isMinimum bool) string {
 	}
 
 	for _, v := range *m.Outputs {
-		if isMinimum {
+		if isNoOutputs {
 			continue
 		}
 		rootBody.AppendNewline()

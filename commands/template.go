@@ -25,15 +25,23 @@ func (c *TemplateCommand) Run(args []string) int {
 
 	// flags
 	var name string
+	var isNoDefault bool
+	var isNoOutputs bool
 	var isMinimum bool
 	buf := &bytes.Buffer{}
 	f := flag.NewFlagSet("template", flag.ContinueOnError)
 	f.SetOutput(buf)
 	f.StringVarP(&name, "name", "n", "", "module name")
-	f.BoolVar(&isMinimum, "minimum", false, "print minimum template")
+	f.BoolVar(&isNoDefault, "no-defaults", false, "print template without variables with default values")
+	f.BoolVar(&isNoOutputs, "no-outputs", false, "print template without outputs")
+	f.BoolVar(&isMinimum, "minimum", false, "print minimum template (same as --no-outputs and --no-defaults)")
 	if err := f.Parse(flagArgs); err != nil {
 		c.UI.Error(helpTemplate)
 		return 1
+	}
+	if isMinimum {
+		isNoDefault = true
+		isNoOutputs = true
 	}
 
 	parser := tfmodule.NewParser()
@@ -45,7 +53,7 @@ func (c *TemplateCommand) Run(args []string) int {
 	if name != "" {
 		module.Name = name
 	}
-	c.UI.Output(module.PrintModuleTemplate(isMinimum))
+	c.UI.Output(module.PrintModuleTemplate(isNoDefault, isNoOutputs))
 
 	return 0
 }
@@ -66,5 +74,7 @@ Usage: tfmodule template SOURCE [options]
 Options:
 
   --name=modulename, -n    Name of module
-  --minimum                Ouptput template does not include the variables which has a default value.
+  --no-defaults            Print template without variables with default values
+  --no-outputs             Print template without outputs
+  --minimum                Print minimum template (same as --no-outputs and --no-defaults)
 `
