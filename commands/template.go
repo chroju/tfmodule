@@ -44,8 +44,13 @@ func (c *TemplateCommand) Run(args []string) int {
 		isNoOutputs = true
 	}
 
-	parser := tfmodule.NewLocalParser()
-	module, err := parser.Parse(source)
+	parser, err := tfmodule.NewParser(source)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	module, err := parser.Parse()
 	if err != nil {
 		c.UI.Error(err.Error())
 		return 1

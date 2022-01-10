@@ -34,20 +34,10 @@ type Output struct {
 // Module is a struct to express terraform module
 type Module struct {
 	Name      string      `hcl:"name,label"`
-	Variables *[]Variable `hcl:"variable,block"`
-	Outputs   *[]Output   `hcl:"output,block"`
-	Resources *[]Resource `hcl:"resource,block"`
+	Variables []*Variable `hcl:"variable,block"`
+	Outputs   []*Output   `hcl:"output,block"`
+	Resources []*Resource `hcl:"resource,block"`
 	Source    string      `hcl:"source,attr"`
-}
-
-// NewModule returns a new module
-func NewModule(source string) *Module {
-	separetedSourcePath := strings.Split(source, "/")
-	name := separetedSourcePath[len(separetedSourcePath)-1]
-	return &Module{
-		Source: source,
-		Name:   name,
-	}
 }
 
 // String returns module HCL expression
@@ -58,6 +48,9 @@ func (m *Module) String() string {
 func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
 	f := hclwrite.NewEmptyFile()
 
+	separetedSourcePath := strings.Split(m.Source, "/")
+	m.Name = separetedSourcePath[len(separetedSourcePath)-1]
+
 	rootBody := f.Body()
 	moduleBlock := rootBody.AppendNewBlock("module", []string{m.Name})
 	moduleBody := moduleBlock.Body()
@@ -65,7 +58,7 @@ func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
 	moduleBody.SetAttributeValue("source", cty.StringVal(m.Source))
 	moduleBody.AppendNewline()
 
-	for _, v := range *m.Variables {
+	for _, v := range m.Variables {
 		if isNoDefaults && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
 			continue
 		}
@@ -73,7 +66,7 @@ func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
 	}
 
-	for _, v := range *m.Outputs {
+	for _, v := range m.Outputs {
 		if isNoOutputs {
 			continue
 		}
@@ -143,8 +136,8 @@ func (m *Module) PrintModuleAnalysis() string {
 	emptyLine := []string{""}
 	results := []string{"resources:"}
 
-	resources := make([]string, len(*m.Resources))
-	for i, r := range *m.Resources {
+	resources := make([]string, len(m.Resources))
+	for i, r := range m.Resources {
 		resources[i] = "  " + r.Type + "." + r.Name
 	}
 	sort.Strings(resources)
@@ -152,8 +145,8 @@ func (m *Module) PrintModuleAnalysis() string {
 	results = append(results, emptyLine...)
 	results = append(results, "outputs:")
 
-	outputs := make([]string, len(*m.Outputs))
-	for i, o := range *m.Outputs {
+	outputs := make([]string, len(m.Outputs))
+	for i, o := range m.Outputs {
 		outputs[i] = " " + string(o.Value.Bytes())
 	}
 	sort.Strings(outputs)

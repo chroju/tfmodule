@@ -1,6 +1,19 @@
 package tfmodule
 
+import (
+	"errors"
+	"strings"
+)
+
 // Parser represents a terraform module parser.
 type Parser interface {
-	Parse(source string) (*Module, error)
+	Parse() (*Module, error)
+}
+
+func NewParser(source string) (Parser, error) {
+	if strings.HasPrefix(source, "./") || strings.HasPrefix(source, "../") {
+		return NewLocalParser(source), nil
+	} else {
+		return nil, errors.New("Invalid source")
+	}
 }

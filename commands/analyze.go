@@ -20,8 +20,13 @@ func (c *AnalyzeCommand) Run(args []string) int {
 	}
 	source := args[0]
 
-	parser := tfmodule.NewLocalParser()
-	module, err := parser.Parse(source)
+	parser, err := tfmodule.NewParser(source)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	module, err := parser.Parse()
 	if err != nil {
 		c.UI.Error(err.Error())
 		return 1

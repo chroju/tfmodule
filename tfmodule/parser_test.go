@@ -12,7 +12,7 @@ func TestLocalParser(t *testing.T) {
 	module1 := &Module{
 		Name:   "module1",
 		Source: "./test/module1",
-		Outputs: &[]Output{
+		Outputs: []*Output{
 			{
 				Name: "test",
 				Value: hclwrite.Tokens{
@@ -40,7 +40,7 @@ func TestLocalParser(t *testing.T) {
 				Description: "test instance",
 			},
 		},
-		Variables: &[]Variable{
+		Variables: []*Variable{
 			{
 				Name:    "no_default",
 				Default: hclwrite.TokensForValue(cty.StringVal("")),
@@ -181,9 +181,9 @@ func TestLocalParser(t *testing.T) {
 		{"hashicorp/consul/aws", (*Module)(nil)},
 	}
 
-	p := NewLocalParser()
 	for _, test := range tests {
-		m, _ := p.Parse(test.source)
+		p := NewLocalParser(test.source)
+		m, _ := p.Parse()
 		if m == nil {
 			if test.module == nil {
 				continue
