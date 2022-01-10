@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-type AnalysisPrinter struct {
+type analysisPrinter struct {
 	Module *Module
 }
 
-func NewAnalysisPrinter(m *Module) *AnalysisPrinter {
-	return &AnalysisPrinter{
+func newAnalysisPrinter(m *Module) *analysisPrinter {
+	return &analysisPrinter{
 		Module: m,
 	}
 }
 
-func (p *AnalysisPrinter) Print() (string, error) {
+func (p *analysisPrinter) Print() (string, error) {
 	emptyLine := []string{""}
 	results := []string{"resources:"}
 

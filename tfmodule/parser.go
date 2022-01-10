@@ -12,7 +12,7 @@ type Parser interface {
 
 func NewParser(source string) (Parser, error) {
 	if strings.HasPrefix(source, "./") || strings.HasPrefix(source, "../") {
-		return NewLocalParser(source), nil
+		return newLocalParser(source), nil
 	} else {
 		return nil, errors.New("Invalid source")
 	}

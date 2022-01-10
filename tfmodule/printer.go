@@ -20,9 +20,9 @@ func NewPrinter(m *Module, o *PrintOptions) (Printer, error) {
 
 	switch o.Format {
 	case "template":
-		p = NewTemplatePrinter(m, o.IsNoDefaults, o.IsNoOutputs)
+		p = newTemplatePrinter(m, o.IsNoDefaults, o.IsNoOutputs)
 	case "analysis":
-		p = NewAnalysisPrinter(m)
+		p = newAnalysisPrinter(m)
 	default:
 		return nil, errors.New("Invalid printer format.")
 	}

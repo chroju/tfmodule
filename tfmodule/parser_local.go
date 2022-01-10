@@ -13,19 +13,19 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-type LocalParser struct {
+type localParser struct {
 	Source string
 }
 
-// NewLocalParser return a new parser with local terraform module.
-func NewLocalParser(source string) Parser {
-	return &LocalParser{
+// newLocalParser return a new parser with local terraform module.
+func newLocalParser(source string) Parser {
+	return &localParser{
 		Source: source,
 	}
 }
 
 // Parse parses a local terraform module and returns module structs
-func (p *LocalParser) Parse() (*Module, error) {
+func (p *localParser) Parse() (*Module, error) {
 	if !(strings.HasPrefix(p.Source, "./") || strings.HasPrefix(p.Source, "../")) {
 		return nil, errors.New("Invalid local module path.")
 	}
@@ -80,7 +80,7 @@ func (p *LocalParser) Parse() (*Module, error) {
 	}, nil
 }
 
-func (p *LocalParser) parseVariable(block *hclwrite.Block) *Variable {
+func (p *localParser) parseVariable(block *hclwrite.Block) *Variable {
 	variable := Variable{
 		Name:    block.Labels()[0],
 		Default: hclwrite.TokensForValue(cty.StringVal("")),
@@ -106,7 +106,7 @@ func (p *LocalParser) parseVariable(block *hclwrite.Block) *Variable {
 	return &variable
 }
 
-func (p *LocalParser) parseOutput(block *hclwrite.Block) *Output {
+func (p *localParser) parseOutput(block *hclwrite.Block) *Output {
 	output := Output{
 		Name:        block.Labels()[0],
 		Description: "",
@@ -128,7 +128,7 @@ func (p *LocalParser) parseOutput(block *hclwrite.Block) *Output {
 	return &output
 }
 
-func (p *LocalParser) parseResource(block *hclwrite.Block) *Resource {
+func (p *localParser) parseResource(block *hclwrite.Block) *Resource {
 	resource := Resource{
 		Type: block.Labels()[0],
 		Name: block.Labels()[1],

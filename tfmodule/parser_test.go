@@ -183,7 +183,7 @@ func TestLocalParser(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		p := NewLocalParser(test.source)
+		p := newLocalParser(test.source)
 		m, _ := p.Parse()
 		if m == nil {
 			if test.module == nil {

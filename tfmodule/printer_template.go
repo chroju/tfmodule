@@ -9,21 +9,21 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-type TemplatePrinter struct {
+type templatePrinter struct {
 	Module       *Module
 	IsNoDefaults bool
 	IsNoOutputs  bool
 }
 
-func NewTemplatePrinter(m *Module, isNoDefaults, isNoOutputs bool) *TemplatePrinter {
-	return &TemplatePrinter{
+func newTemplatePrinter(m *Module, isNoDefaults, isNoOutputs bool) *templatePrinter {
+	return &templatePrinter{
 		Module:       m,
 		IsNoDefaults: isNoDefaults,
 		IsNoOutputs:  isNoOutputs,
 	}
 }
 
-func (p *TemplatePrinter) Print() (string, error) {
+func (p *templatePrinter) Print() (string, error) {
 	f := hclwrite.NewEmptyFile()
 
 	if p.Module.Name == "" {
