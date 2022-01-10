@@ -26,8 +26,10 @@ func NewTemplatePrinter(m *Module, isNoDefaults, isNoOutputs bool) *TemplatePrin
 func (p *TemplatePrinter) Print() (string, error) {
 	f := hclwrite.NewEmptyFile()
 
-	separetedSourcePath := strings.Split(p.Module.Source, "/")
-	p.Module.Name = separetedSourcePath[len(separetedSourcePath)-1]
+	if p.Module.Name == "" {
+		separetedSourcePath := strings.Split(p.Module.Source, "/")
+		p.Module.Name = separetedSourcePath[len(separetedSourcePath)-1]
+	}
 
 	rootBody := f.Body()
 	moduleBlock := rootBody.AppendNewBlock("module", []string{p.Module.Name})
