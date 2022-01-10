@@ -1,0 +1,45 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm64
+    binary: remo
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - none*
+changelog:
+  skip: true
+brews:
+  - name: tfmodule
+    tap:
+      owner: chroju
+      name: homebrew-tap
+      token:
+    url_template: "https://github.com/chroju/tfmodule/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    description: "tfmodule is a CLI tool for managing Terraform modules."
+    homepage: "https://github.com/chroju/tfmodule"
+    license: "MIT"
+    test: |
+      system "#{bin}/tfmodule --version"
+    install: |
+      bin.install "tfmodule"

@@ -8,11 +8,16 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-func TestParseTfModule(t *testing.T) {
+func TestLocalParser(t *testing.T) {
 	module1 := &Module{
-		Name:   "module1",
 		Source: "./test/module1",
-		Outputs: &[]Output{
+		Resources: []*Resource{
+			{
+				Name: "instance",
+				Type: "aws_instance",
+			},
+		},
+		Outputs: []*Output{
 			{
 				Name: "test",
 				Value: hclwrite.Tokens{
@@ -40,7 +45,7 @@ func TestParseTfModule(t *testing.T) {
 				Description: "test instance",
 			},
 		},
-		Variables: &[]Variable{
+		Variables: []*Variable{
 			{
 				Name:    "no_default",
 				Default: hclwrite.TokensForValue(cty.StringVal("")),
@@ -178,20 +183,21 @@ func TestParseTfModule(t *testing.T) {
 	}{
 		{"./test/module1", module1},
 		{"./test/not_exist", (*Module)(nil)},
+		{"hashicorp/consul/aws", (*Module)(nil)},
 	}
 
-	p := NewParser()
 	for _, test := range tests {
-		m, _ := p.ParseTfModule(test.source)
+		p := newLocalParser(test.source)
+		m, _ := p.Parse()
 		if m == nil {
 			if test.module == nil {
 				continue
 			} else {
-				t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
+				t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 			}
 		}
 		if m.String() != test.module.String() {
-			t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
+			t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 		}
 	}
 }

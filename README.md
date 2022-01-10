@@ -1,12 +1,19 @@
 tfmodule
 ========
 
+[![release badge](https://img.shields.io/github/v/release/chroju/tfmodule.svg)](https://github.com/chroju/tfmodule/releases)
 ![test](https://github.com/chroju/tfmodule/workflows/test/badge.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/chroju/tfmodule/badge.svg?branch=master)](https://coveralls.io/github/chroju/tfmodule?branch=master)
 
 tfmodule is a CLI tool for managing Terraform modules.
 
 ## Install
+
+### Homebrew
+
+```bash
+$ brew install chroju/tap/tfmodule
+```
 
 ### Download binary
 
@@ -28,7 +35,7 @@ tfmodule has sub-commands `template` , `analyze` .
 
 `template` parses the Terraform module configuration in the given file path, and outputs a template for the module.
 
-```bash
+```hcl
 $ tfmodule template ../modules/hoge
 module "hoge" {
   source = "../modules/hoge"
@@ -48,7 +55,7 @@ output "hoge_instance_id" {
 
 You can replace module name in the template with `-n` or `--name` option.
 
-```
+```hcl
 $ tfmodule template ../modules/hoge -n fuga
 module "fuga" {
   source = "../modules/hoge"
@@ -65,7 +72,7 @@ output "fuga_instance_id" {
 
 Use the `--no-default` option, ignore variables with default values, and `--no-outputs` option, ignore outputs.
 
-```
+```hcl
 $ tfmodule template ../modules/hoge --no-defaults --no-outputs
 module "fuga" {
   source = "../modules/hoge"
@@ -78,7 +85,7 @@ module "fuga" {
 
 `--minimum` has the same meaning as adding both `--no-outputs` and `--no-defaults` .
 
-```
+```hcl
 $ tfmodule template ../modules/hoge --minimum
 module "fuga" {
   source = "../modules/hoge"
@@ -107,6 +114,6 @@ outputs:
 
 - [ ] Analyze the modules on the Internet as well.
 
-## Author
+## LICENSE
 
-chroju <chor.chroju@gmail.com>
+[MIT](https://github.com/chroju/tfmodule/blob/main/LICENSE)

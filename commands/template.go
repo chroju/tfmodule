@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/chroju/tfmodule/tfmodule"
@@ -11,7 +10,11 @@ import (
 
 // TemplateCommand
 type TemplateCommand struct {
-	UI cli.Ui
+	UI           cli.Ui
+	Name         string
+	IsNoDefaults bool
+	IsNoOutputs  bool
+	IsMinimum    bool
 }
 
 // Run runs template sub-command
@@ -24,36 +27,55 @@ func (c *TemplateCommand) Run(args []string) int {
 	flagArgs := args[1:]
 
 	// flags
-	var name string
-	var isNoDefault bool
-	var isNoOutputs bool
-	var isMinimum bool
-	buf := &bytes.Buffer{}
 	f := flag.NewFlagSet("template", flag.ContinueOnError)
-	f.SetOutput(buf)
-	f.StringVarP(&name, "name", "n", "", "module name")
-	f.BoolVar(&isNoDefault, "no-defaults", false, "print template without variables with default values")
-	f.BoolVar(&isNoOutputs, "no-outputs", false, "print template without outputs")
-	f.BoolVar(&isMinimum, "minimum", false, "print minimum template (same as --no-outputs and --no-defaults)")
+	f.StringVarP(&c.Name, "name", "n", "", "module name")
+	f.BoolVar(&c.IsNoDefaults, "no-defaults", false, "print template without variables with default values")
+	f.BoolVar(&c.IsNoOutputs, "no-outputs", false, "print template without outputs")
+	f.BoolVar(&c.IsMinimum, "minimum", false, "print minimum template (same as --no-outputs and --no-defaults)")
 	if err := f.Parse(flagArgs); err != nil {
 		c.UI.Error(helpTemplate)
 		return 1
 	}
-	if isMinimum {
-		isNoDefault = true
-		isNoOutputs = true
+	if c.IsMinimum {
+		c.IsNoDefaults = true
+		c.IsNoOutputs = true
 	}
 
-	parser := tfmodule.NewParser()
-	module, err := parser.ParseTfModule(source)
+	parser, err := tfmodule.NewParser(source)
 	if err != nil {
 		c.UI.Error(err.Error())
 		return 1
 	}
-	if name != "" {
-		module.Name = name
+
+	module, err := parser.Parse()
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
 	}
-	c.UI.Output(module.PrintModuleTemplate(isNoDefault, isNoOutputs))
+
+	if c.Name != "" {
+		module.Name = c.Name
+	}
+
+	options := &tfmodule.PrintOptions{
+		Format:       "template",
+		IsNoDefaults: c.IsNoDefaults,
+		IsNoOutputs:  c.IsNoOutputs,
+	}
+
+	printer, err := tfmodule.NewPrinter(module, options)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	out, err := printer.Print()
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	c.UI.Output(out)
 
 	return 0
 }

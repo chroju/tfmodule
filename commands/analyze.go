@@ -20,13 +20,32 @@ func (c *AnalyzeCommand) Run(args []string) int {
 	}
 	source := args[0]
 
-	parser := tfmodule.NewParser()
-	module, err := parser.ParseTfModule(source)
+	parser, err := tfmodule.NewParser(source)
 	if err != nil {
 		c.UI.Error(err.Error())
 		return 1
 	}
-	c.UI.Output(module.PrintModuleAnalysis())
+
+	module, err := parser.Parse()
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	options := &tfmodule.PrintOptions{Format: "analysis"}
+	printer, err := tfmodule.NewPrinter(module, options)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	out, err := printer.Print()
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	c.UI.Output(out)
 
 	return 0
 }

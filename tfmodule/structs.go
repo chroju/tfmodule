@@ -1,13 +1,10 @@
 package tfmodule
 
 import (
-	"reflect"
-	"sort"
+	"fmt"
 	"strings"
 
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
-	"github.com/zclconf/go-cty/cty"
 )
 
 // Resource is terraform module resource
@@ -34,131 +31,27 @@ type Output struct {
 // Module is a struct to express terraform module
 type Module struct {
 	Name      string      `hcl:"name,label"`
-	Variables *[]Variable `hcl:"variable,block"`
-	Outputs   *[]Output   `hcl:"output,block"`
-	Resources *[]Resource `hcl:"resource,block"`
+	Variables []*Variable `hcl:"variable,block"`
+	Outputs   []*Output   `hcl:"output,block"`
+	Resources []*Resource `hcl:"resource,block"`
 	Source    string      `hcl:"source,attr"`
 }
 
-// NewModule returns a new module
-func NewModule(source string) *Module {
-	separetedSourcePath := strings.Split(source, "/")
-	name := separetedSourcePath[len(separetedSourcePath)-1]
-	return &Module{
-		Source: source,
-		Name:   name,
-	}
-}
-
-// String returns module HCL expression
 func (m *Module) String() string {
-	return m.PrintModuleTemplate(false, false)
-}
-
-func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
-	f := hclwrite.NewEmptyFile()
-
-	rootBody := f.Body()
-	moduleBlock := rootBody.AppendNewBlock("module", []string{m.Name})
-	moduleBody := moduleBlock.Body()
-
-	moduleBody.SetAttributeValue("source", cty.StringVal(m.Source))
-	moduleBody.AppendNewline()
-
-	for _, v := range *m.Variables {
-		if isNoDefaults && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
-			continue
-		}
-		moduleBody.AppendUnstructuredTokens(v.generateComment())
-		moduleBody.SetAttributeRaw(v.Name, v.Default)
+	var s string
+	s = fmt.Sprintf("Name: %s\nSource: %s\nVariables: \n", m.Name, m.Source)
+	for _, v := range m.Variables {
+		s += fmt.Sprintf("  %s", v.Name)
+		s += fmt.Sprintf(" %s", strings.ReplaceAll(string(v.Type.Bytes()), " ", ""))
+		s += fmt.Sprintf(" %s", v.Description)
+		s += fmt.Sprintf(" %s\n", strings.ReplaceAll(string(v.Default.Bytes()), " ", ""))
+	}
+	s += "Outputs: \n"
+	for _, v := range m.Outputs {
+		s += fmt.Sprintf("  %s", v.Name)
+		s += fmt.Sprintf(" %s", strings.ReplaceAll(string(v.Value.Bytes()), " ", ""))
+		s += fmt.Sprintf(" %s\n", v.Description)
 	}
 
-	for _, v := range *m.Outputs {
-		if isNoOutputs {
-			continue
-		}
-		rootBody.AppendNewline()
-		outputBlock := rootBody.AppendNewBlock("output", []string{m.Name + "_" + v.Name})
-		outputBody := outputBlock.Body()
-		tokens := hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte("module"),
-			},
-			{
-				Type:  hclsyntax.TokenDot,
-				Bytes: []byte("."),
-			},
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(m.Name),
-			},
-			{
-				Type:  hclsyntax.TokenDot,
-				Bytes: []byte("."),
-			},
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(v.Name),
-			},
-		}
-		outputBody.SetAttributeRaw("value", tokens)
-	}
-
-	return string(f.Bytes())
-}
-
-func (v *Variable) generateComment() hclwrite.Tokens {
-	tokens := hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenSlash,
-			Bytes: []byte("//"),
-		},
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(v.Description),
-		},
-		{
-			Type:  hclsyntax.TokenNewline,
-			Bytes: []byte("\n"),
-		},
-		{
-			Type:  hclsyntax.TokenSlash,
-			Bytes: []byte("//"),
-		},
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte("type:"),
-		},
-	}
-	tokens = append(tokens, v.Type...)
-	tokens = append(tokens, &hclwrite.Token{
-		Type:  hclsyntax.TokenNewline,
-		Bytes: []byte("\n"),
-	})
-	return tokens
-}
-
-func (m *Module) PrintModuleAnalysis() string {
-	emptyLine := []string{""}
-	results := []string{"resources:"}
-
-	resources := make([]string, len(*m.Resources))
-	for i, r := range *m.Resources {
-		resources[i] = "  " + r.Type + "." + r.Name
-	}
-	sort.Strings(resources)
-	results = append(results, resources...)
-	results = append(results, emptyLine...)
-	results = append(results, "outputs:")
-
-	outputs := make([]string, len(*m.Outputs))
-	for i, o := range *m.Outputs {
-		outputs[i] = " " + string(o.Value.Bytes())
-	}
-	sort.Strings(outputs)
-	results = append(results, outputs...)
-	results = append(results, emptyLine...)
-
-	return strings.Join(results, "\n")
+	return s
 }

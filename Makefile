@@ -14,6 +14,7 @@ install: test
 	go install
 
 build: test
+	rm -rf bin/
 	mkdir bin
 	go build -o bin/${BINARY_NAME}
 
