@@ -1,6 +1,7 @@
 package tfmodule
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -188,11 +189,11 @@ func TestLocalParser(t *testing.T) {
 			if test.module == nil {
 				continue
 			} else {
-				t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
+				t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 			}
 		}
-		if m.String() != test.module.String() {
-			t.Errorf("source %s: %s\nExpected: %s", test.source, m, test.module)
+		if !reflect.DeepEqual(m, test.module) {
+			t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 		}
 	}
 }

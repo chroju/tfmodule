@@ -31,7 +31,21 @@ func (c *AnalyzeCommand) Run(args []string) int {
 		c.UI.Error(err.Error())
 		return 1
 	}
-	c.UI.Output(module.PrintModuleAnalysis())
+
+	options := &tfmodule.PrintOptions{Format: "analysis"}
+	printer, err := tfmodule.NewPrinter(module, options)
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	out, err := printer.Print()
+	if err != nil {
+		c.UI.Error(err.Error())
+		return 1
+	}
+
+	c.UI.Output(out)
 
 	return 0
 }

@@ -1,13 +1,8 @@
 package tfmodule
 
 import (
-	"reflect"
-	"sort"
-	"strings"
-
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
-	"github.com/zclconf/go-cty/cty"
 )
 
 // Resource is terraform module resource
@@ -40,67 +35,6 @@ type Module struct {
 	Source    string      `hcl:"source,attr"`
 }
 
-// String returns module HCL expression
-func (m *Module) String() string {
-	return m.PrintModuleTemplate(false, false)
-}
-
-func (m *Module) PrintModuleTemplate(isNoDefaults, isNoOutputs bool) string {
-	f := hclwrite.NewEmptyFile()
-
-	separetedSourcePath := strings.Split(m.Source, "/")
-	m.Name = separetedSourcePath[len(separetedSourcePath)-1]
-
-	rootBody := f.Body()
-	moduleBlock := rootBody.AppendNewBlock("module", []string{m.Name})
-	moduleBody := moduleBlock.Body()
-
-	moduleBody.SetAttributeValue("source", cty.StringVal(m.Source))
-	moduleBody.AppendNewline()
-
-	for _, v := range m.Variables {
-		if isNoDefaults && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
-			continue
-		}
-		moduleBody.AppendUnstructuredTokens(v.generateComment())
-		moduleBody.SetAttributeRaw(v.Name, v.Default)
-	}
-
-	for _, v := range m.Outputs {
-		if isNoOutputs {
-			continue
-		}
-		rootBody.AppendNewline()
-		outputBlock := rootBody.AppendNewBlock("output", []string{m.Name + "_" + v.Name})
-		outputBody := outputBlock.Body()
-		tokens := hclwrite.Tokens{
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte("module"),
-			},
-			{
-				Type:  hclsyntax.TokenDot,
-				Bytes: []byte("."),
-			},
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(m.Name),
-			},
-			{
-				Type:  hclsyntax.TokenDot,
-				Bytes: []byte("."),
-			},
-			{
-				Type:  hclsyntax.TokenIdent,
-				Bytes: []byte(v.Name),
-			},
-		}
-		outputBody.SetAttributeRaw("value", tokens)
-	}
-
-	return string(f.Bytes())
-}
-
 func (v *Variable) generateComment() hclwrite.Tokens {
 	tokens := hclwrite.Tokens{
 		{
@@ -130,28 +64,4 @@ func (v *Variable) generateComment() hclwrite.Tokens {
 		Bytes: []byte("\n"),
 	})
 	return tokens
-}
-
-func (m *Module) PrintModuleAnalysis() string {
-	emptyLine := []string{""}
-	results := []string{"resources:"}
-
-	resources := make([]string, len(m.Resources))
-	for i, r := range m.Resources {
-		resources[i] = "  " + r.Type + "." + r.Name
-	}
-	sort.Strings(resources)
-	results = append(results, resources...)
-	results = append(results, emptyLine...)
-	results = append(results, "outputs:")
-
-	outputs := make([]string, len(m.Outputs))
-	for i, o := range m.Outputs {
-		outputs[i] = " " + string(o.Value.Bytes())
-	}
-	sort.Strings(outputs)
-	results = append(results, outputs...)
-	results = append(results, emptyLine...)
-
-	return strings.Join(results, "\n")
 }
