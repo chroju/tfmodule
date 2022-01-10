@@ -8,7 +8,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-func TestParseTfModule(t *testing.T) {
+func TestLocalParser(t *testing.T) {
 	module1 := &Module{
 		Name:   "module1",
 		Source: "./test/module1",
@@ -178,6 +178,7 @@ func TestParseTfModule(t *testing.T) {
 	}{
 		{"./test/module1", module1},
 		{"./test/not_exist", (*Module)(nil)},
+		{"hashicorp/consul/aws", (*Module)(nil)},
 	}
 
 	p := NewLocalParser()

@@ -1,6 +1,7 @@
 package tfmodule
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -26,6 +27,10 @@ func (p *LocalParser) Parse(source string) (*Module, error) {
 	var variables []Variable
 	var outputs []Output
 	var resources []Resource
+
+	if !(strings.HasPrefix(source, "./") || strings.HasPrefix(source, "../")) {
+		return nil, errors.New("Invalid local module path.")
+	}
 
 	p.source = source
 	err := filepath.Walk(p.source,
