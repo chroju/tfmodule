@@ -42,7 +42,7 @@ func (p *templatePrinter) Print() (string, error) {
 		if p.IsNoDefaults && !reflect.DeepEqual(v.Default, hclwrite.TokensForValue(cty.StringVal(""))) {
 			continue
 		}
-		moduleBody.AppendUnstructuredTokens(v.generateComment())
+		moduleBody.AppendUnstructuredTokens(p.generateVariableComment(v))
 		moduleBody.SetAttributeRaw(v.Name, v.Default)
 	}
 
@@ -79,4 +79,35 @@ func (p *templatePrinter) Print() (string, error) {
 	}
 
 	return string(f.Bytes()), nil
+}
+
+func (p *templatePrinter) generateVariableComment(v *Variable) hclwrite.Tokens {
+	tokens := hclwrite.Tokens{
+		{
+			Type:  hclsyntax.TokenSlash,
+			Bytes: []byte("//"),
+		},
+		{
+			Type:  hclsyntax.TokenIdent,
+			Bytes: []byte(v.Description),
+		},
+		{
+			Type:  hclsyntax.TokenNewline,
+			Bytes: []byte("\n"),
+		},
+		{
+			Type:  hclsyntax.TokenSlash,
+			Bytes: []byte("//"),
+		},
+		{
+			Type:  hclsyntax.TokenIdent,
+			Bytes: []byte("type:"),
+		},
+	}
+	tokens = append(tokens, v.Type...)
+	tokens = append(tokens, &hclwrite.Token{
+		Type:  hclsyntax.TokenNewline,
+		Bytes: []byte("\n"),
+	})
+	return tokens
 }

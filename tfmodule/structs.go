@@ -1,7 +1,6 @@
 package tfmodule
 
 import (
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
@@ -33,35 +32,4 @@ type Module struct {
 	Outputs   []*Output   `hcl:"output,block"`
 	Resources []*Resource `hcl:"resource,block"`
 	Source    string      `hcl:"source,attr"`
-}
-
-func (v *Variable) generateComment() hclwrite.Tokens {
-	tokens := hclwrite.Tokens{
-		{
-			Type:  hclsyntax.TokenSlash,
-			Bytes: []byte("//"),
-		},
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte(v.Description),
-		},
-		{
-			Type:  hclsyntax.TokenNewline,
-			Bytes: []byte("\n"),
-		},
-		{
-			Type:  hclsyntax.TokenSlash,
-			Bytes: []byte("//"),
-		},
-		{
-			Type:  hclsyntax.TokenIdent,
-			Bytes: []byte("type:"),
-		},
-	}
-	tokens = append(tokens, v.Type...)
-	tokens = append(tokens, &hclwrite.Token{
-		Type:  hclsyntax.TokenNewline,
-		Bytes: []byte("\n"),
-	})
-	return tokens
 }
