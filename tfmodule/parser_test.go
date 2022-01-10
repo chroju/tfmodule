@@ -1,7 +1,6 @@
 package tfmodule
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -11,8 +10,13 @@ import (
 
 func TestLocalParser(t *testing.T) {
 	module1 := &Module{
-		Name:   "module1",
 		Source: "./test/module1",
+		Resources: []*Resource{
+			{
+				Name: "instance",
+				Type: "aws_instance",
+			},
+		},
 		Outputs: []*Output{
 			{
 				Name: "test",
@@ -192,7 +196,7 @@ func TestLocalParser(t *testing.T) {
 				t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 			}
 		}
-		if !reflect.DeepEqual(m, test.module) {
+		if m.String() != test.module.String() {
 			t.Errorf("source %s: %v\nExpected: %v", test.source, m, test.module)
 		}
 	}
